@@ -36,6 +36,9 @@ requirements:
     - ${{ stdlib("c") }}
     - cmake
     - ninja
+    - if: unix
+      then:
+      - make
   host:
     - python
     - scikit-build-core >=0.10.0
@@ -45,6 +48,7 @@ requirements:
     - pytest
   run:
     - python
+    - numpy >=1.26.0
     - pydantic
     - sentencepiece
     - tiktoken
