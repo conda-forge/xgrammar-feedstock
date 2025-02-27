@@ -1,72 +1,86 @@
+schema_version: 1
+
 context:
   name: xgrammar
-  version: 0.1.11
+  version: 0.1.14
 
 package:
   name: ${{ name|lower }}
   version: ${{ version }}
 
 source:
-  url: https://github.com/mlc-ai/xgrammar/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: 99f5321454320b76d0ef8a0b060c92c9ccadb6c96a9ba7b9c1543ba7f14e5cf2
-  patches:
-    - 001-fix-macos-no-triton.patch
+  url: https://pypi.org/packages/source/${{ name[0] }}/${{ name }}/xgrammar-${{ version }}.tar.gz
+  sha256: b0d11ee9d10a9812f2b646a40b149e8ead88251ff1f3cac2709efd31882176f2
 
 build:
-  number: 2
-  skip:
-    - win # xgrammar claims windows support but it's very broken
-  script: |
-    mkdir -p build
-    cd build
-    export CXXFLAGS="$CXXFLAGS -isystem $PREFIX/include"
-    if [[ $(uname) == "Linux" ]]; then
-      export CXXFLAGS="$CXXFLAGS -Wno-dangling-reference"
-    fi
-    cmake ${CMAKE_ARGS} .. -G Ninja
-    ninja
-    cd ../python
-    ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  number: 0
+  script:
+    - if: unix
+      then: |
+        export CXXFLAGS="$CXXFLAGS -isystem $PREFIX/include"
+        if [[ $(uname) == "Linux" ]]; then
+          export CXXFLAGS="$CXXFLAGS -Wno-dangling-reference"
+        fi
+    - ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
 
 requirements:
   build:
-    # TODO: cross-compiling for Linux aarch64 is broken but works for m1
     - if: build_platform != target_platform
       then:
-        - python
-        - cross-python_${{ target_platform }}
-        - pybind11
-        - setuptools
-        - dlpack
+      - python
+      - cross-python_${{ target_platform }}
+      - pybind11
+      - scikit-build-core >=0.10.0
+      - dlpack
+      - pytest
     - ${{ compiler('c') }}
     - ${{ compiler('cxx') }}
     - ${{ stdlib("c") }}
     - cmake
     - ninja
-  host:
-    - dlpack
-    - pybind11
-    - python
-    - cmake
-    - pip
-    - setuptools
-  run:
-    - if: linux
+    - if: unix
       then:
-        - triton
-    - pydantic
+      - make
+  host:
     - python
+    - scikit-build-core >=0.10.0
+    - pybind11 >=2.11.0
+    - pip
+    - dlpack
+    - pytest
+  run:
+    - python
+    - numpy >=1.26.0
+    - pydantic
     - sentencepiece
     - tiktoken
-    - pytorch
-    - transformers
-    - pytest
+    - pytorch >=1.10.0
+    - transformers >=4.38.0
+    - if: linux and x86_64
+      then: triton
 
 tests:
   - python:
       imports:
         - xgrammar
       pip_check: true
+
+  - script:
+      - python -m pytest tests/ -m "not hf_token_required"
+    files:
+      source:
+        - tests/
+    requirements:
+      run:
+        - protobuf
+        - pytest
+        - huggingface_hub
+        - numpy >=1.26.0
+        - pydantic
+        - sentencepiece
+        - tiktoken
+        - pytorch >=1.10.0
+        - transformers >=4.38.0
 
 about:
   homepage: https://github.com/mlc-ai/xgrammar
