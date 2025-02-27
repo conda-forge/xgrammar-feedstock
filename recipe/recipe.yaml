@@ -14,12 +14,14 @@ source:
 
 build:
   number: 0
-  script: |
-    export CXXFLAGS="$CXXFLAGS -isystem $PREFIX/include"
-    if [[ $(uname) == "Linux" ]]; then
-      export CXXFLAGS="$CXXFLAGS -Wno-dangling-reference"
-    fi
-    ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+  script:
+    - if: unix
+      then: |
+        export CXXFLAGS="$CXXFLAGS -isystem $PREFIX/include"
+        if [[ $(uname) == "Linux" ]]; then
+          export CXXFLAGS="$CXXFLAGS -Wno-dangling-reference"
+        fi
+    - ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
 
 requirements:
   build:
@@ -71,6 +73,7 @@ tests:
     requirements:
       run:
         - protobuf
+        - pytest
         - huggingface_hub
         - numpy >=1.26.0
         - pydantic
