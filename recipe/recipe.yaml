@@ -54,7 +54,7 @@ requirements:
     - tiktoken
     - pytorch >=1.10.0
     - transformers >=4.38.0
-    - if: linux
+    - if: linux and x86_64
       then: triton
 
 tests:
@@ -62,6 +62,22 @@ tests:
       imports:
         - xgrammar
       pip_check: true
+
+  - script:
+      - python -m pytest tests/ -m "not hf_token_required"
+    files:
+      source:
+        - tests/
+    requirements:
+      run:
+        - protobuf
+        - huggingface_hub
+        - numpy >=1.26.0
+        - pydantic
+        - sentencepiece
+        - tiktoken
+        - pytorch >=1.10.0
+        - transformers >=4.38.0
 
 about:
   homepage: https://github.com/mlc-ai/xgrammar
