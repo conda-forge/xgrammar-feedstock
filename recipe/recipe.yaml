@@ -2,7 +2,7 @@ schema_version: 1
 
 context:
   name: xgrammar
-  version: 0.1.14
+  version: "0.1.15"
 
 package:
   name: ${{ name|lower }}
@@ -10,10 +10,10 @@ package:
 
 source:
   url: https://pypi.org/packages/source/${{ name[0] }}/${{ name }}/xgrammar-${{ version }}.tar.gz
-  sha256: b0d11ee9d10a9812f2b646a40b149e8ead88251ff1f3cac2709efd31882176f2
+  sha256: 620ad447147404ff329bcec55ee3b8fea98ca182cd2a303addb40697345a5a08
 
 build:
-  number: 1
+  number: 0
   script:
     - if: unix
       then: |
@@ -27,12 +27,12 @@ requirements:
   build:
     - if: build_platform != target_platform
       then:
-      - python
-      - cross-python_${{ target_platform }}
-      - pybind11
-      - scikit-build-core >=0.10.0
-      - dlpack
-      - pytest
+        - python
+        - cross-python_${{ target_platform }}
+        - pybind11
+        - scikit-build-core >=0.10.0
+        - dlpack
+        - pytest
     - ${{ compiler('c') }}
     - ${{ compiler('cxx') }}
     - ${{ stdlib("c") }}
@@ -40,7 +40,7 @@ requirements:
     - ninja
     - if: unix
       then:
-      - make
+        - make
   host:
     - python
     - scikit-build-core >=0.10.0
