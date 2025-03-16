@@ -11,6 +11,8 @@ package:
 source:
   url: https://pypi.org/packages/source/${{ name[0] }}/${{ name }}/xgrammar-${{ version }}.tar.gz
   sha256: 4ddd5128a82d0a9c800c03df25c610368ca630704ad20a6bb7a3629f24ced442
+  patches:
+    - patches/001_remove_ninja_dep.patch
 
 build:
   number: 0
