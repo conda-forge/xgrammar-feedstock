@@ -2,7 +2,7 @@ schema_version: 1
 
 context:
   name: xgrammar
-  version: "0.1.15"
+  version: "0.1.16"
 
 package:
   name: ${{ name|lower }}
@@ -10,7 +10,9 @@ package:
 
 source:
   url: https://pypi.org/packages/source/${{ name[0] }}/${{ name }}/xgrammar-${{ version }}.tar.gz
-  sha256: 620ad447147404ff329bcec55ee3b8fea98ca182cd2a303addb40697345a5a08
+  sha256: 4ddd5128a82d0a9c800c03df25c610368ca630704ad20a6bb7a3629f24ced442
+  patches:
+    - patches/001_remove_ninja_dep.patch
 
 build:
   number: 0
@@ -51,6 +53,7 @@ requirements:
   run:
     - python
     - numpy >=1.26.0
+    - ninja
     - pydantic
     - sentencepiece
     - tiktoken
@@ -72,6 +75,7 @@ tests:
         - tests/
     requirements:
       run:
+        - ninja
         - protobuf
         - pytest
         - huggingface_hub
