@@ -51,6 +51,7 @@ requirements:
   run:
     - python
     - numpy >=1.26.0
+    - ninja
     - pydantic
     - sentencepiece
     - tiktoken
@@ -72,6 +73,7 @@ tests:
         - tests/
     requirements:
       run:
+        - ninja
         - protobuf
         - pytest
         - huggingface_hub
