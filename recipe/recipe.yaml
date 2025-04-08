@@ -2,7 +2,7 @@ schema_version: 1
 
 context:
   name: xgrammar
-  version: "0.1.16"
+  version: 0.1.18
 
 package:
   name: ${{ name|lower }}
@@ -10,7 +10,7 @@ package:
 
 source:
   url: https://pypi.org/packages/source/${{ name[0] }}/${{ name }}/xgrammar-${{ version }}.tar.gz
-  sha256: 4ddd5128a82d0a9c800c03df25c610368ca630704ad20a6bb7a3629f24ced442
+  sha256: a0438a0f9262fff1d0e4f184268eb759f094243edce92b67eb7aa5f245c47471
   patches:
     - patches/001_remove_ninja_dep.patch
 
@@ -19,6 +19,7 @@ build:
   script:
     - if: unix
       then: |
+        export CMAKE_BUILD_TYPE=Release
         export CXXFLAGS="$CXXFLAGS -isystem $PREFIX/include"
         if [[ $(uname) == "Linux" ]]; then
           export CXXFLAGS="$CXXFLAGS -Wno-dangling-reference"
@@ -31,10 +32,10 @@ requirements:
       then:
         - python
         - cross-python_${{ target_platform }}
-        - pybind11
         - scikit-build-core >=0.10.0
         - dlpack
         - pytest
+        - nanobind
     - ${{ compiler('c') }}
     - ${{ compiler('cxx') }}
     - ${{ stdlib("c") }}
@@ -46,10 +47,10 @@ requirements:
   host:
     - python
     - scikit-build-core >=0.10.0
-    - pybind11 >=2.11.0
     - pip
     - dlpack
     - pytest
+    - nanobind
   run:
     - python
     - numpy >=1.26.0
@@ -61,6 +62,8 @@ requirements:
     - transformers >=4.38.0
     - if: linux and x86_64
       then: triton
+    - if: darwin and arm64
+      then: mlx-lm
 
 tests:
   - python:
@@ -97,3 +100,4 @@ about:
 extra:
   recipe-maintainers:
     - zbowling
+    - Ubospica

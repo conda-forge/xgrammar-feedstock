@@ -330,5 +330,6 @@ In order to produce a uniquely identifiable distribution:
 Feedstock Maintainers
 =====================
 
+* [@Ubospica](https://github.com/Ubospica/)
 * [@zbowling](https://github.com/zbowling/)
 
