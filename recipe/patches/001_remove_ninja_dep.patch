@@ -1,11 +1,12 @@
 diff --git a/pyproject.toml b/pyproject.toml
-index 11fae7d..5f13c7b 100644
+index f7acfcc..d93a29a 100644
 --- a/pyproject.toml
 +++ b/pyproject.toml
-@@ -21,7 +21,6 @@ dependencies = [
+@@ -20,7 +20,6 @@ dependencies = [
+   "torch>=1.10.0",
    "transformers>=4.38.0",
-   "triton; platform_system == 'Linux' and platform_machine == 'x86_64'",
-   "mlx-lm; platform_system == 'Darwin' and platform_machine == 'arm64'",
+   "triton; platform_system == 'linux' and platform_machine == 'x86_64'",
 -  "ninja",
+   "nanobind>=2.0.0",
  ]
  dynamic = ["version"]
