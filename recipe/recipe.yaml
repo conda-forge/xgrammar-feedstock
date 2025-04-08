@@ -35,7 +35,7 @@ requirements:
         - scikit-build-core >=0.10.0
         - dlpack
         - pytest
-        - nanobind>=2.5.0
+        - nanobind >=2.5.0
     - ${{ compiler('c') }}
     - ${{ compiler('cxx') }}
     - ${{ stdlib("c") }}
@@ -51,7 +51,7 @@ requirements:
     - pip
     - dlpack
     - pytest
-    - nanobind>=2.5.0
+    - nanobind >=2.5.0
   run:
     - python
     - numpy >=1.26.0
