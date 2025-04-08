@@ -7,6 +7,7 @@ index 37be6ce..13037cf 100644
    "transformers>=4.38.0",
    "triton; platform_system == 'linux' and platform_machine == 'x86_64'",
 -  "ninja",
+   "nanobind>=2.0.0",
  ]
  dynamic = ["version"]
  
