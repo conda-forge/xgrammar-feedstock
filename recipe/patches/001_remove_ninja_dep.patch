@@ -23,7 +23,7 @@ index 8ea5622..873cd02 100644
  
  # Any code that uses nanobind directly lives here
 -nanobind_add_module(xgrammar_bindings LTO nanobind.cc)
-+nanobind_add_module(xgrammar_bindings NB_STATIC nanobind.cc)
++nanobind_add_module(xgrammar_bindings nanobind.cc)
  target_link_libraries(xgrammar_bindings PRIVATE python_methods)
  
  if(DEFINED SKBUILD_PROJECT_NAME)

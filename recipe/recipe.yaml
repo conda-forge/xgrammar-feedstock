@@ -19,11 +19,13 @@ build:
   script:
     - if: unix
       then: |
+        export CMAKE_POSITION_INDEPENDENT_CODE=ON
+        export CMAKE_BUILD_TYPE=Release
         export CXXFLAGS="$CXXFLAGS -isystem $PREFIX/include"
         if [[ $(uname) == "Linux" ]]; then
           export CXXFLAGS="$CXXFLAGS -Wno-dangling-reference"
         fi
-    - ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+    - ${{ PYTHON }} -m pip install . -vvv
 
 requirements:
   build:
@@ -31,11 +33,10 @@ requirements:
       then:
         - python
         - cross-python_${{ target_platform }}
-        - pybind11
         - scikit-build-core >=0.10.0
         - dlpack
         - pytest
-        - nanobind >=2.5.0
+        - nanobind
     - ${{ compiler('c') }}
     - ${{ compiler('cxx') }}
     - ${{ stdlib("c") }}
@@ -47,11 +48,10 @@ requirements:
   host:
     - python
     - scikit-build-core >=0.10.0
-    - pybind11 >=2.11.0
     - pip
     - dlpack
     - pytest
-    - nanobind >=2.5.0
+    - nanobind
   run:
     - python
     - numpy >=1.26.0
