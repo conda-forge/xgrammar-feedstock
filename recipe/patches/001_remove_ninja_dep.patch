@@ -15,16 +15,6 @@ diff --git i/cpp/nanobind/CMakeLists.txt w/cpp/nanobind/CMakeLists.txt
 index 8ea5622..365d9e6 100644
 --- i/cpp/nanobind/CMakeLists.txt
 +++ w/cpp/nanobind/CMakeLists.txt
-@@ -3,6 +3,9 @@ find_package(
-   COMPONENTS Interpreter Development.Module
-   REQUIRED
- )
-+execute_process(
-+  COMMAND "${Python_EXECUTABLE}" -m nanobind --cmake_dir
-+  OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE nanobind_ROOT)
- find_package(nanobind CONFIG REQUIRED)
- 
- # Compile this source file seperately. Nanobind suggests to optimize bindings code for size, but
 @@ -13,7 +16,7 @@ target_sources(python_methods PRIVATE python_methods.cc)
  target_link_libraries(python_methods PUBLIC xgrammar)
  

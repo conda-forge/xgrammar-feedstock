@@ -19,8 +19,6 @@ build:
   script:
     - if: unix
       then: |
-        export CMAKE_POSITION_INDEPENDENT_CODE=ON
-        export CMAKE_BUILD_TYPE=Release
         export CXXFLAGS="$CXXFLAGS -isystem $PREFIX/include"
         if [[ $(uname) == "Linux" ]]; then
           export CXXFLAGS="$CXXFLAGS -Wno-dangling-reference"
