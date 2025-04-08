@@ -1,5 +1,5 @@
 diff --git i/cpp/nanobind/CMakeLists.txt w/cpp/nanobind/CMakeLists.txt
-index 8ea5622..b1be814 100644
+index 8ea5622..365d9e6 100644
 --- i/cpp/nanobind/CMakeLists.txt
 +++ w/cpp/nanobind/CMakeLists.txt
 @@ -3,6 +3,9 @@ find_package(
@@ -17,7 +17,7 @@ index 8ea5622..b1be814 100644
  
  # Any code that uses nanobind directly lives here
 -nanobind_add_module(xgrammar_bindings LTO nanobind.cc)
-+nanobind_add_module(xgrammar_bindings NB_STATIC STABLE_ABI LTO nanobind.cc)
++nanobind_add_module(xgrammar_bindings NB_STATIC nanobind.cc)
  target_link_libraries(xgrammar_bindings PRIVATE python_methods)
  
  if(DEFINED SKBUILD_PROJECT_NAME)
