@@ -1,5 +1,5 @@
 diff --git i/cpp/nanobind/CMakeLists.txt w/cpp/nanobind/CMakeLists.txt
-index 8ea5622..365d9e6 100644
+index 8ea5622..51cc35c 100644
 --- i/cpp/nanobind/CMakeLists.txt
 +++ w/cpp/nanobind/CMakeLists.txt
 @@ -3,6 +3,9 @@ find_package(
@@ -12,12 +12,15 @@ index 8ea5622..365d9e6 100644
  find_package(nanobind CONFIG REQUIRED)
  
  # Compile this source file seperately. Nanobind suggests to optimize bindings code for size, but
-@@ -13,7 +16,7 @@ target_sources(python_methods PRIVATE python_methods.cc)
+@@ -11,9 +14,10 @@ find_package(nanobind CONFIG REQUIRED)
+ add_library(python_methods STATIC)
+ target_sources(python_methods PRIVATE python_methods.cc)
  target_link_libraries(python_methods PUBLIC xgrammar)
++set_target_properties(python_methods PROPERTIES POSITION_INDEPENDENT_CODE ON)
  
  # Any code that uses nanobind directly lives here
 -nanobind_add_module(xgrammar_bindings LTO nanobind.cc)
-+nanobind_add_module(xgrammar_bindings NB_STATIC nanobind.cc)
++nanobind_add_module(xgrammar_bindings NB_SHARED nanobind.cc)
  target_link_libraries(xgrammar_bindings PRIVATE python_methods)
  
  if(DEFINED SKBUILD_PROJECT_NAME)
