@@ -1,3 +1,16 @@
+diff --git i/cpp/nanobind/CMakeLists.txt w/cpp/nanobind/CMakeLists.txt
+index 8ea5622..18fdc70 100644
+--- i/cpp/nanobind/CMakeLists.txt
++++ w/cpp/nanobind/CMakeLists.txt
+@@ -10,7 +10,7 @@ find_package(nanobind CONFIG REQUIRED)
+ # https://nanobind.readthedocs.io/en/latest/api_cmake.html#command:nanobind_add_module
+ add_library(python_methods STATIC)
+ target_sources(python_methods PRIVATE python_methods.cc)
+-target_link_libraries(python_methods PUBLIC xgrammar)
++target_link_libraries(python_methods PRIVATE xgrammar)
+ 
+ # Any code that uses nanobind directly lives here
+ nanobind_add_module(xgrammar_bindings LTO nanobind.cc)
 diff --git i/pyproject.toml w/pyproject.toml
 index 11fae7d..5f13c7b 100644
 --- i/pyproject.toml
