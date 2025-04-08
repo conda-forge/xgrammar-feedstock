@@ -1,5 +1,5 @@
 diff --git i/cpp/nanobind/CMakeLists.txt w/cpp/nanobind/CMakeLists.txt
-index 8ea5622..106a9ff 100644
+index 8ea5622..65f948f 100644
 --- i/cpp/nanobind/CMakeLists.txt
 +++ w/cpp/nanobind/CMakeLists.txt
 @@ -3,6 +3,9 @@ find_package(
@@ -24,6 +24,14 @@ index 8ea5622..106a9ff 100644
  target_link_libraries(xgrammar_bindings PRIVATE python_methods)
  
  if(DEFINED SKBUILD_PROJECT_NAME)
+@@ -23,6 +27,7 @@ else()
+   set(LIB_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/python/xgrammar)
+ endif()
+ 
++set_target_properties(xgrammar_bindings PROPERTIES POSITION_INDEPENDENT_CODE ON)
+ set_target_properties(xgrammar_bindings PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${LIB_OUTPUT_DIRECTORY})
+ set_target_properties(
+   xgrammar_bindings PROPERTIES LIBRARY_OUTPUT_DIRECTORY_DEBUG ${LIB_OUTPUT_DIRECTORY}
 diff --git i/pyproject.toml w/pyproject.toml
 index 11fae7d..5f13c7b 100644
 --- i/pyproject.toml
