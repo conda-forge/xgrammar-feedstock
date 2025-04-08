@@ -1,29 +1,21 @@
 diff --git i/CMakeLists.txt w/CMakeLists.txt
-index 911d9f9..338c089 100644
+index 911d9f9..801c9fa 100644
 --- i/CMakeLists.txt
 +++ w/CMakeLists.txt
-@@ -51,7 +51,7 @@ else()
-   endif()
- 
+@@ -46,12 +46,8 @@ message(STATUS "Enable C++ trace: ${XGRAMMAR_ENABLE_CPPTRACE}")
+ if(MSVC)
+   set(CMAKE_CXX_FLAGS "/Wall ${CMAKE_CXX_FLAGS}")
+ else()
+-  if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+-    set(CMAKE_CXX_FLAGS "-O3 ${CMAKE_CXX_FLAGS}")
+-  endif()
+-
    set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -Wno-pedantic -Wno-unused-parameter \
 --Woverloaded-virtual -flto=auto ${CMAKE_CXX_FLAGS}"
 +-Woverloaded-virtual ${CMAKE_CXX_FLAGS}"
    )
  endif()
  
-diff --git i/cpp/nanobind/CMakeLists.txt w/cpp/nanobind/CMakeLists.txt
-index 8ea5622..365d9e6 100644
---- i/cpp/nanobind/CMakeLists.txt
-+++ w/cpp/nanobind/CMakeLists.txt
-@@ -13,7 +16,7 @@ target_sources(python_methods PRIVATE python_methods.cc)
- target_link_libraries(python_methods PUBLIC xgrammar)
- 
- # Any code that uses nanobind directly lives here
--nanobind_add_module(xgrammar_bindings LTO nanobind.cc)
-+nanobind_add_module(xgrammar_bindings NB_STATIC nanobind.cc)
- target_link_libraries(xgrammar_bindings PRIVATE python_methods)
- 
- if(DEFINED SKBUILD_PROJECT_NAME)
 diff --git i/pyproject.toml w/pyproject.toml
 index 11fae7d..5f13c7b 100644
 --- i/pyproject.toml
