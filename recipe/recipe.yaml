@@ -19,7 +19,7 @@ build:
   script:
     - if: unix
       then: |
-        export CXXFLAGS="$CXXFLAGS -isystem $PREFIX/include"
+        export CXXFLAGS="$CXXFLAGS -isystem $PREFIX/include -lnanobind"
         if [[ $(uname) == "Linux" ]]; then
           export CXXFLAGS="$CXXFLAGS -Wno-dangling-reference"
         fi
