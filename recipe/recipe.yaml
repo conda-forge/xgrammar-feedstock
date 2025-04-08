@@ -23,7 +23,7 @@ build:
         if [[ $(uname) == "Linux" ]]; then
           export CXXFLAGS="$CXXFLAGS -Wno-dangling-reference"
         fi
-    - ${{ PYTHON }} -m pip install . -vvv
+    - ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
 
 requirements:
   build:
