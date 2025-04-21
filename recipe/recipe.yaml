@@ -62,7 +62,7 @@ requirements:
     - transformers >=4.38.0
     - if: linux and x86_64
       then: triton
-    - if: darwin and arm64
+    - if: osx and arm64
       then: mlx-lm
 
 tests:
