@@ -2,7 +2,7 @@ schema_version: 1
 
 context:
   name: xgrammar
-  version: "0.1.22"
+  version: "0.1.23"
 
 package:
   name: ${{ name|lower }}
@@ -10,7 +10,7 @@ package:
 
 source:
   url: https://pypi.org/packages/source/${{ name[0] }}/${{ name }}/xgrammar-${{ version }}.tar.gz
-  sha256: bc435e7a21c69bed149697b09939494e24bad31ed0a38ec827117dc8f890b96f
+  sha256: 5ef280455c1ac008f052d7ea92286f0ca3a3d7ab360224894ac69277c8827113
   patches:
     - patches/001_remove_ninja_dep.patch
 
