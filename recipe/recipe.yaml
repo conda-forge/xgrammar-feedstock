@@ -11,8 +11,6 @@ package:
 source:
   url: https://pypi.org/packages/source/${{ name[0] }}/${{ name }}/xgrammar-${{ version }}.tar.gz
   sha256: 5d424d52779ca2d3ccaf72f2289d6519efe308e933d0d3fc3c292c780825bb12
-  patches:
-    - patches/001_remove_ninja_dep.patch
 
 build:
   number: 0
@@ -23,6 +21,10 @@ build:
         export CXXFLAGS="$CXXFLAGS -isystem $PREFIX/include"
         if [[ $(uname) == "Linux" ]]; then
           export CXXFLAGS="$CXXFLAGS -Wno-dangling-reference"
+          # Disable LTO - nanobind's stub compilation model is incompatible with LTO
+          export CXXFLAGS="$CXXFLAGS -fno-lto"
+          export LDFLAGS="$LDFLAGS -fno-lto"
+          export CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_CXX_FLAGS=-fno-lto -DCMAKE_C_FLAGS=-fno-lto"
         fi
     - ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
 
