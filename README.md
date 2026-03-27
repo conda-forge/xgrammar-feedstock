@@ -295,6 +295,7 @@ In order to produce a uniquely identifiable distribution:
 Feedstock Maintainers
 =====================
 
+* [@LeeNethertonQC](https://github.com/LeeNethertonQC/)
 * [@Ubospica](https://github.com/Ubospica/)
 * [@zbowling](https://github.com/zbowling/)
 
