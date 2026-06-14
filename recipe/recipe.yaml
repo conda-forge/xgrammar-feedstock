@@ -2,7 +2,7 @@ schema_version: 1
 
 context:
   name: xgrammar
-  version: "0.2.0"
+  version: "0.2.1"
 
 package:
   name: ${{ name|lower }}
@@ -10,7 +10,7 @@ package:
 
 source:
   url: https://pypi.org/packages/source/${{ name[0] }}/${{ name }}/xgrammar-${{ version }}.tar.gz
-  sha256: c4f0238a89869343171d43d069b8c5da874f3c2c25f408f20cd5987219a6adef
+  sha256: 4c48c251b75d211e9ffa7f4f4ac8b5b0164f89fd5f0d1883ad7ff4554922030d
 
 build:
   number: 0
@@ -92,7 +92,7 @@ tests:
       pip_check: true
 
   - script:
-      - python -m pytest tests/ -m "not hf_token_required" --deselect tests/python/test_builtin_structural_tag_alignment.py::test_reasoning_stag --deselect tests/python/test_serialization.py::test_serialize_compiled_grammar
+      - python -m pytest tests/ -m "not hf_token_required"
     files:
       source:
         - tests/
