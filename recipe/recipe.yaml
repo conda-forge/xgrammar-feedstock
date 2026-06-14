@@ -21,7 +21,7 @@ build:
         export CXXFLAGS="$CXXFLAGS -isystem $PREFIX/include"
         if [[ $(uname) == "Linux" ]]; then
           export CXXFLAGS="$CXXFLAGS -Wno-dangling-reference"
-          # Disable LTO - nanobind's stub compilation model is incompatible with LTO
+          # Disable LTO to avoid linker issues with tvm_ffi shared library
           export CXXFLAGS="$CXXFLAGS -fno-lto"
           export LDFLAGS="$LDFLAGS -fno-lto"
           export CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_CXX_FLAGS=-fno-lto -DCMAKE_C_FLAGS=-fno-lto"
@@ -35,9 +35,7 @@ requirements:
         - python
         - cross-python_${{ target_platform }}
         - scikit-build-core >=0.10.0
-        - dlpack
-        - pytest
-        - nanobind
+        - apache-tvm-ffi >=0.1.9
     - ${{ compiler('c') }}
     - ${{ compiler('cxx') }}
     - ${{ stdlib("c") }}
@@ -50,11 +48,10 @@ requirements:
     - python
     - scikit-build-core >=0.10.0
     - pip
-    - dlpack
-    - pytest
-    - nanobind
+    - apache-tvm-ffi >=0.1.9
   run:
     - python
+    - apache-tvm-ffi >=0.1.9
     - numpy >=1.26.0
     - ninja
     - pydantic
@@ -62,6 +59,7 @@ requirements:
     - tiktoken
     - pytorch >=1.10.0
     - transformers >=4.38.0
+    - typing_extensions >=4.9.0
     - if: linux and x86_64
       then: triton
     - if: osx and arm64
