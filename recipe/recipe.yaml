@@ -21,14 +21,55 @@ build:
       then: |
         export CMAKE_BUILD_TYPE=Release
         export CXXFLAGS="$CXXFLAGS -isystem $PREFIX/include"
+        # Disable LTO to avoid linker issues with tvm_ffi shared library
+        export CXXFLAGS="$CXXFLAGS -fno-lto"
+        export LDFLAGS="$LDFLAGS -fno-lto"
+        export CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_CXX_FLAGS=-fno-lto -DCMAKE_C_FLAGS=-fno-lto"
+        if [[ "${CONDA_BUILD_CROSS_COMPILATION:-}" == "1" ]]; then
+          # Cross-compilation fixes for tvm_ffi:
+          # 1. Write a custom cmake config that hardcodes host env paths (the upstream config
+          #    uses Python_EXECUTABLE to discover paths, which picks up build-arch libs).
+          TVM_FFI_DIR=$PREFIX/lib/python${PY_VER}/site-packages/tvm_ffi
+          TVM_FFI_CMAKE=$SRC_DIR/tvm_ffi_override
+          mkdir -p $TVM_FFI_CMAKE
+          printf '%s\n' \
+            'add_library(tvm_ffi::header INTERFACE IMPORTED)' \
+            'target_compile_features(tvm_ffi::header INTERFACE cxx_std_17)' \
+            "target_include_directories(tvm_ffi::header INTERFACE \"${TVM_FFI_DIR}/include\")" \
+            "target_include_directories(tvm_ffi::header INTERFACE \"${TVM_FFI_DIR}/include/dlpack\")" \
+            'add_library(tvm_ffi::shared SHARED IMPORTED)' \
+            'target_compile_features(tvm_ffi::shared INTERFACE cxx_std_17)' \
+            "set_target_properties(tvm_ffi::shared PROPERTIES IMPORTED_LOCATION \"${TVM_FFI_DIR}/lib/libtvm_ffi${SHLIB_EXT}\")" \
+            "set_target_properties(tvm_ffi::shared PROPERTIES INTERFACE_INCLUDE_DIRECTORIES \"${TVM_FFI_DIR}/include;${TVM_FFI_DIR}/include/dlpack\")" \
+            "include(${TVM_FFI_DIR}/share/cmake/tvm_ffi/Utils/Library.cmake)" \
+            "include(${TVM_FFI_DIR}/share/cmake/tvm_ffi/Utils/EmbedCubin.cmake)" \
+            > $TVM_FFI_CMAKE/tvm_ffi-config.cmake
+          export CMAKE_ARGS="$CMAKE_ARGS -Dtvm_ffi_ROOT=$TVM_FFI_CMAKE"
+          # 2. Disable stub generation post-build step (it uses ctypes.CDLL to load the
+          #    cross-compiled library which fails: arm64 lib on x86_64 host).
+          sed 's/STUB_DIR.*STUB_INIT ON//' cpp/tvm_ffi/CMakeLists.txt > cpp/tvm_ffi/CMakeLists.txt.tmp
+          mv cpp/tvm_ffi/CMakeLists.txt.tmp cpp/tvm_ffi/CMakeLists.txt
+        fi
         if [[ $(uname) == "Linux" ]]; then
           export CXXFLAGS="$CXXFLAGS -Wno-dangling-reference"
-          # Disable LTO to avoid linker issues with tvm_ffi shared library
-          export CXXFLAGS="$CXXFLAGS -fno-lto"
-          export LDFLAGS="$LDFLAGS -fno-lto"
-          export CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_CXX_FLAGS=-fno-lto -DCMAKE_C_FLAGS=-fno-lto"
         fi
     - ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+    - if: unix
+      then: |
+        # During cross-compilation, we disabled stub generation so we must create
+        # the tvm_ffi_binding module manually. init_ffi_api populates modules with
+        # FFI functions from the loaded shared library (no arch-specific content).
+        if [[ "${CONDA_BUILD_CROSS_COMPILATION:-}" == "1" ]]; then
+          B=$SP_DIR/xgrammar/tvm_ffi_binding
+          mkdir -p $B/kernels $B/testing/grammar_functor
+          I='from tvm_ffi.registry import init_ffi_api as _FFI_INIT_FUNC'
+          touch $B/__init__.py $B/kernels/__init__.py $B/testing/__init__.py $B/testing/grammar_functor/__init__.py
+          printf '%s\n' "$I" '_FFI_INIT_FUNC("xgrammar", __name__)' > $B/_ffi_api.py
+          printf '%s\n' "$I" '_FFI_INIT_FUNC("xgrammar.config", __name__)' > $B/config.py
+          printf '%s\n' "$I" '_FFI_INIT_FUNC("xgrammar.kernels", __name__)' > $B/kernels/_ffi_api.py
+          printf '%s\n' "$I" '_FFI_INIT_FUNC("xgrammar.testing", __name__)' > $B/testing/_ffi_api.py
+          printf '%s\n' "$I" '_FFI_INIT_FUNC("xgrammar.testing.grammar_functor", __name__)' > $B/testing/grammar_functor/_ffi_api.py
+        fi
 
 requirements:
   build:
