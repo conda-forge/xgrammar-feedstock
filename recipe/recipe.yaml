@@ -92,7 +92,7 @@ tests:
       pip_check: true
 
   - script:
-      - python -m pytest tests/ -m "not hf_token_required" --deselect tests/python/test_builtin_structural_tag_alignment.py::test_reasoning_stag --deselect tests/python/test_serialization.py::test_serialize_compiled_grammar
+      - python -m pytest tests/ -m "not hf_token_required"
     files:
       source:
         - tests/
