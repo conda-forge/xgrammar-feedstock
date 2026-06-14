@@ -20,11 +20,11 @@ build:
     - if: unix
       then: |
         export CMAKE_BUILD_TYPE=Release
-        # Disable LTO to avoid linker issues with tvm_ffi shared library
-        export CXXFLAGS="$CXXFLAGS -isystem $PREFIX/include -fno-lto"
-        export LDFLAGS="$LDFLAGS -fno-lto"
         if [[ $(uname) == "Linux" ]]; then
           export CXXFLAGS="$CXXFLAGS -Wno-dangling-reference"
+          # Disable LTO to avoid linker issues with tvm_ffi shared library
+          export CXXFLAGS="$CXXFLAGS -isystem $PREFIX/include -fno-lto"
+          export LDFLAGS="$LDFLAGS -fno-lto"
         fi
         if [[ "${CONDA_BUILD_CROSS_COMPILATION:-}" == "1" ]]; then
           # Cross-compilation fixes for tvm_ffi:
@@ -33,14 +33,17 @@ build:
           export TVM_FFI_DIR=$PREFIX/lib/python${PY_VER}/site-packages/tvm_ffi
           TVM_FFI_CMAKE=$SRC_DIR/tvm_ffi_override
           mkdir -p $TVM_FFI_CMAKE
-          envsubst '$TVM_FFI_DIR $SHLIB_EXT' < $RECIPE_DIR/tvm_ffi-cross.cmake.in > $TVM_FFI_CMAKE/tvm_ffi-config.cmake
+          sed -e "s|\${TVM_FFI_DIR}|${TVM_FFI_DIR}|g" -e "s|\${SHLIB_EXT}|${SHLIB_EXT}|g" \
+            $RECIPE_DIR/tvm_ffi-cross.cmake.in > $TVM_FFI_CMAKE/tvm_ffi-config.cmake
           export CMAKE_ARGS="$CMAKE_ARGS -Dtvm_ffi_ROOT=$TVM_FFI_CMAKE"
           # 2. Disable stub generation post-build step (it uses ctypes.CDLL to load the
           #    cross-compiled library which fails: arm64 lib on x86_64 host).
           sed 's/STUB_DIR.*STUB_INIT ON//' cpp/tvm_ffi/CMakeLists.txt > cpp/tvm_ffi/CMakeLists.txt.tmp
           mv cpp/tvm_ffi/CMakeLists.txt.tmp cpp/tvm_ffi/CMakeLists.txt
         fi
-        ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+    - ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+    - if: unix
+      then: |
         if [[ "${CONDA_BUILD_CROSS_COMPILATION:-}" == "1" ]]; then
           bash $RECIPE_DIR/create_ffi_stubs.sh
         fi
