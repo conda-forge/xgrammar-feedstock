@@ -2,7 +2,7 @@ schema_version: 1
 
 context:
   name: xgrammar
-  version: "0.1.33"
+  version: "0.1.34"
 
 package:
   name: ${{ name|lower }}
@@ -10,23 +10,43 @@ package:
 
 source:
   url: https://pypi.org/packages/source/${{ name[0] }}/${{ name }}/xgrammar-${{ version }}.tar.gz
-  sha256: 8dbe5fc3d76651ab1fac7a68fc2a118b885fa0ec7189927fb6e0dce0081aea99
+  sha256: ac72a4c3fdb56654bf904fce11cd7135d7cdba696e5d03039f90e1655b97ede4
 
 build:
-  number: 1
+  number: 0
+  skip:
+    - win
   script:
     - if: unix
       then: |
         export CMAKE_BUILD_TYPE=Release
-        export CXXFLAGS="$CXXFLAGS -isystem $PREFIX/include"
         if [[ $(uname) == "Linux" ]]; then
           export CXXFLAGS="$CXXFLAGS -Wno-dangling-reference"
-          # Disable LTO - nanobind's stub compilation model is incompatible with LTO
-          export CXXFLAGS="$CXXFLAGS -fno-lto"
+          # Disable LTO to avoid linker issues with tvm_ffi shared library
+          export CXXFLAGS="$CXXFLAGS -isystem $PREFIX/include -fno-lto"
           export LDFLAGS="$LDFLAGS -fno-lto"
-          export CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_CXX_FLAGS=-fno-lto -DCMAKE_C_FLAGS=-fno-lto"
+        fi
+        if [[ "${CONDA_BUILD_CROSS_COMPILATION:-}" == "1" ]]; then
+          # Cross-compilation fixes for tvm_ffi:
+          # 1. Write a custom cmake config that hardcodes host env paths (the upstream config
+          #    uses Python_EXECUTABLE to discover paths, which picks up build-arch libs).
+          export TVM_FFI_DIR=$PREFIX/lib/python${PY_VER}/site-packages/tvm_ffi
+          TVM_FFI_CMAKE=$SRC_DIR/tvm_ffi_override
+          mkdir -p $TVM_FFI_CMAKE
+          sed -e "s|\${TVM_FFI_DIR}|${TVM_FFI_DIR}|g" -e "s|\${SHLIB_EXT}|${SHLIB_EXT}|g" \
+            $RECIPE_DIR/tvm_ffi-cross.cmake.in > $TVM_FFI_CMAKE/tvm_ffi-config.cmake
+          export CMAKE_ARGS="$CMAKE_ARGS -Dtvm_ffi_ROOT=$TVM_FFI_CMAKE"
+          # 2. Disable stub generation post-build step (it uses ctypes.CDLL to load the
+          #    cross-compiled library which fails: arm64 lib on x86_64 host).
+          sed 's/STUB_DIR.*STUB_INIT ON//' cpp/tvm_ffi/CMakeLists.txt > cpp/tvm_ffi/CMakeLists.txt.tmp
+          mv cpp/tvm_ffi/CMakeLists.txt.tmp cpp/tvm_ffi/CMakeLists.txt
         fi
     - ${{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+    - if: unix
+      then: |
+        if [[ "${CONDA_BUILD_CROSS_COMPILATION:-}" == "1" ]]; then
+          bash $RECIPE_DIR/create_ffi_stubs.sh
+        fi
 
 requirements:
   build:
@@ -35,9 +55,7 @@ requirements:
         - python
         - cross-python_${{ target_platform }}
         - scikit-build-core >=0.10.0
-        - dlpack
-        - pytest
-        - nanobind
+        - apache-tvm-ffi >=0.1.9
     - ${{ compiler('c') }}
     - ${{ compiler('cxx') }}
     - ${{ stdlib("c") }}
@@ -50,11 +68,10 @@ requirements:
     - python
     - scikit-build-core >=0.10.0
     - pip
-    - dlpack
-    - pytest
-    - nanobind
+    - apache-tvm-ffi >=0.1.9
   run:
     - python
+    - apache-tvm-ffi >=0.1.9
     - numpy >=1.26.0
     - ninja
     - pydantic
@@ -62,6 +79,7 @@ requirements:
     - tiktoken
     - pytorch >=1.10.0
     - transformers >=4.38.0
+    - typing_extensions >=4.9.0
     - if: linux and x86_64
       then: triton
     - if: osx and arm64
