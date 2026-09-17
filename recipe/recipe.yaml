@@ -93,7 +93,10 @@ tests:
       pip_check: true
 
   - script:
-      - python -m pytest tests/ -m "not hf_token_required"
+      # cohere_melody (upstream's "test" extra, used only by the MELODY:cmd5 alignment
+      # cases in test_builtin_structural_tag_alignment.py) is PyPI-only and not
+      # packaged on conda-forge, so those specific cases are deselected here.
+      - python -m pytest tests/ -m "not hf_token_required" -k "not MELODY and not cohere_melody"
     files:
       source:
         - tests/
