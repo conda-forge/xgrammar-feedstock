@@ -95,7 +95,8 @@ tests:
   - script:
       # cohere_melody (upstream's "test" extra, used only by the MELODY:cmd5 alignment
       # cases in test_builtin_structural_tag_alignment.py) is PyPI-only and not
-      # packaged on conda-forge, so those specific cases are deselected here.
+      # packaged on conda-forge. It's an optional test dependency upstream, so we
+      # don't add it here; instead, those specific cases are deselected below.
       - python -m pytest tests/ -m "not hf_token_required" -k "not MELODY and not cohere_melody"
     files:
       source:
