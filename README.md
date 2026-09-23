@@ -236,5 +236,6 @@ Feedstock Maintainers
 
 * [@LeeNethertonQC](https://github.com/LeeNethertonQC/)
 * [@Ubospica](https://github.com/Ubospica/)
+* [@pb01ka](https://github.com/pb01ka/)
 * [@zbowling](https://github.com/zbowling/)
 
