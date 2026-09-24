@@ -2,7 +2,7 @@ schema_version: 1
 
 context:
   name: xgrammar
-  version: "0.2.3"
+  version: "0.2.7"
 
 package:
   name: ${{ name|lower }}
@@ -10,12 +10,10 @@ package:
 
 source:
   url: https://pypi.org/packages/source/${{ name[0] }}/${{ name }}/xgrammar-${{ version }}.tar.gz
-  sha256: f76423630ae3ac4e090cb38ce1e30e7bcc69b3dee4d22d94353944386a4c6f18
+  sha256: 7674afeee5e6eff9672627b62d5ab0aa2347ea51674f4d78a5c160029f92bc3e
 
 build:
-  number: 1
-  skip:
-    - win
+  number: 0
   script:
     - if: unix
       then: |
@@ -93,7 +91,11 @@ tests:
       pip_check: true
 
   - script:
-      - python -m pytest tests/ -m "not hf_token_required"
+      # cohere_melody (upstream's "test" extra, used only by the MELODY:cmd5 alignment
+      # cases in test_builtin_structural_tag_alignment.py) is PyPI-only and not
+      # packaged on conda-forge. It's an optional test dependency upstream, so we
+      # don't add it here; instead, those specific cases are deselected below.
+      - python -m pytest tests/ -m "not hf_token_required" -k "not MELODY and not cohere_melody"
     files:
       source:
         - tests/
@@ -123,3 +125,4 @@ extra:
     - zbowling
     - Ubospica
     - LeeNethertonQC
+    - pb01ka
