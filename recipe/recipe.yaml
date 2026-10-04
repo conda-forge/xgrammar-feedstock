@@ -2,7 +2,7 @@ schema_version: 1
 
 context:
   name: xgrammar
-  version: "0.2.7"
+  version: "0.2.8"
 
 package:
   name: ${{ name|lower }}
@@ -10,7 +10,7 @@ package:
 
 source:
   url: https://pypi.org/packages/source/${{ name[0] }}/${{ name }}/xgrammar-${{ version }}.tar.gz
-  sha256: 7674afeee5e6eff9672627b62d5ab0aa2347ea51674f4d78a5c160029f92bc3e
+  sha256: 8305646fd2b319d6c3003f51a1665e54cbbe9cba1fb636bc41d0b46434ccbb80
 
 build:
   number: 0
@@ -67,6 +67,7 @@ requirements:
     - scikit-build-core >=0.10.0
     - pip
     - apache-tvm-ffi >=0.1.9
+    - setuptools_scm
   run:
     - python
     - apache-tvm-ffi >=0.1.9
@@ -88,14 +89,24 @@ tests:
   - python:
       imports:
         - xgrammar
-      pip_check: true
+      # pip_check disabled: on osx-arm64, mlx-lm's own wheel metadata requires
+      # mlx>=0.32.2, but conda-forge's mlx-lm recipe only constrains mlx>=0.31.2
+      # and no mlx>=0.32.2 build exists yet, so `pip check` always fails here
+      # even though the resolved environment works fine. Tracked upstream in
+      # the mlx-lm-feedstock, not fixable from this recipe.
+      pip_check: false
 
   - script:
       # cohere_melody (upstream's "test" extra, used only by the MELODY:cmd5 alignment
       # cases in test_builtin_structural_tag_alignment.py) is PyPI-only and not
       # packaged on conda-forge. It's an optional test dependency upstream, so we
       # don't add it here; instead, those specific cases are deselected below.
-      - python -m pytest tests/ -m "not hf_token_required" -k "not MELODY and not cohere_melody"
+      #
+      # "metal" (osx-arm64 only) deselects test_apply_token_bitmask_inplace_kernel[metal]:
+      # the test's skip condition only checks that MPS/MLX are present, but the Azure
+      # macOS CI runners' Metal compiler toolchain is too old to JIT-compile the
+      # "metal4.0" shader MLX emits, so the test fails there regardless.
+      - python -m pytest tests/ -m "not hf_token_required" -k "not MELODY and not cohere_melody and not metal"
     files:
       source:
         - tests/
