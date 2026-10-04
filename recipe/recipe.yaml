@@ -67,6 +67,7 @@ requirements:
     - scikit-build-core >=0.10.0
     - pip
     - apache-tvm-ffi >=0.1.9
+    - setuptools_scm
   run:
     - python
     - apache-tvm-ffi >=0.1.9
