@@ -101,7 +101,12 @@ tests:
       # cases in test_builtin_structural_tag_alignment.py) is PyPI-only and not
       # packaged on conda-forge. It's an optional test dependency upstream, so we
       # don't add it here; instead, those specific cases are deselected below.
-      - python -m pytest tests/ -m "not hf_token_required" -k "not MELODY and not cohere_melody"
+      #
+      # "metal" (osx-arm64 only) deselects test_apply_token_bitmask_inplace_kernel[metal]:
+      # the test's skip condition only checks that MPS/MLX are present, but the Azure
+      # macOS CI runners' Metal compiler toolchain is too old to JIT-compile the
+      # "metal4.0" shader MLX emits, so the test fails there regardless.
+      - python -m pytest tests/ -m "not hf_token_required" -k "not MELODY and not cohere_melody and not metal"
     files:
       source:
         - tests/
