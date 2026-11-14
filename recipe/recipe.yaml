@@ -106,7 +106,11 @@ tests:
       # the test's skip condition only checks that MPS/MLX are present, but the Azure
       # macOS CI runners' Metal compiler toolchain is too old to JIT-compile the
       # "metal4.0" shader MLX emits, so the test fails there regardless.
-      - python -m pytest tests/ -m "not hf_token_required" -k "not MELODY and not cohere_melody and not metal"
+      #
+      # test_prepare_tokenizer_assets.py is ignored outright: it imports a repo-root
+      # scripts/ file that upstream's sdist doesn't package, so collection fails with
+      # FileNotFoundError before "-k"/"-m" filtering can even apply.
+      - python -m pytest tests/ -m "not hf_token_required" -k "not MELODY and not cohere_melody and not metal" --ignore=tests/python/test_prepare_tokenizer_assets.py
     files:
       source:
         - tests/
